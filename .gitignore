@@ -1,0 +1,17 @@
+.env
+.env.local
+.env.*.local
+node_modules/
+dist/
+build/
+*.log
+*.pid
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+data/users.json
+data/tasks.json
+data/attachments.json
+uploads/

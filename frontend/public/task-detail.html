@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Details - Task Manager</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="task-detail-page">
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1>Task Manager</h1>
+        <div class="user-info">
+          <span id="userName">User</span>
+          <p id="userEmail" class="user-email"></p>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li><a href="dashboard.html" class="nav-item">← Back to Tasks</a></li>
+        </ul>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <div id="taskContent" class="task-detail">
+        <p class="loading">Loading task details...</p>
+      </div>
+    </main>
+  </div>
+  
+  <!-- Edit Task Modal -->
+  <div id="editModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Task</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      
+      <form id="editForm" class="task-form">
+        <div class="form-group">
+          <label for="editTitle">Title</label>
+          <input type="text" id="editTitle" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="editDesc">Description</label>
+          <textarea id="editDesc" rows="4"></textarea>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editPriority">Priority</label>
+            <select id="editPriority">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="editDue">Due Date</label>
+            <input type="date" id="editDue">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="editStatus">Status</label>
+          <select id="editStatus">
+            <option value="pending">Pending</option>
+            <option value="in-progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- File Upload Modal -->
+  <div id="uploadModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Upload File</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      
+      <form id="uploadForm" class="upload-form">
+        <div class="form-group">
+          <label for="fileInput">Choose File</label>
+          <input type="file" id="fileInput" required>
+          <p class="file-hint">Max 5MB. Allowed: PDF, images, documents</p>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script src="js/api.js"></script>
+  <script src="js/task-detail.js"></script>
+</body>
+</html>
