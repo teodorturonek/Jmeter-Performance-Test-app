@@ -1,72 +1,39 @@
 #!/bin/bash
+# Setup script for Tasks app (native install, no Docker)
+# Prerequisites: PostgreSQL running locally, psql available
 
-# JMeter Training App Setup Script
-# Automates backend and frontend setup
+set -e
 
-echo "🚀 JMeter Training App Setup"
-echo "============================"
-echo ""
+DB_NAME="tasks_db"
+DB_USER="tasks_user"
+DB_PASS="tasks_pass"
 
-# Check for Node.js
-if ! command -v node &> /dev/null; then
-  echo "❌ Node.js is not installed"
-  echo "Please install from: https://nodejs.org/"
-  exit 1
+# Detect the PostgreSQL superuser (Homebrew uses current user, Linux uses postgres)
+if psql -U postgres -d postgres -c "SELECT 1" >/dev/null 2>&1; then
+  PG_SUPER="postgres"
+else
+  PG_SUPER="$(whoami)"
 fi
 
-echo "✓ Node.js version: $(node --version)"
-echo ""
+echo "=== Tasks App Setup ==="
+echo "Using PostgreSQL superuser: ${PG_SUPER}"
 
-# Setup Backend
-echo "📦 Setting up Backend Server..."
-cd server
+# Create PostgreSQL user and database
+echo "Creating database user and database..."
+psql -U "${PG_SUPER}" -d postgres -c "CREATE USER ${DB_USER} WITH PASSWORD '${DB_PASS}';" 2>/dev/null || echo "User ${DB_USER} already exists, skipping."
+psql -U "${PG_SUPER}" -d postgres -c "CREATE DATABASE ${DB_NAME} OWNER ${DB_USER};" 2>/dev/null || echo "Database ${DB_NAME} already exists, skipping."
+psql -U "${PG_SUPER}" -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO ${DB_USER};"
 
-if [ ! -f ".env" ]; then
-  echo "Creating .env file from .env.example..."
-  cp .env.example .env
-fi
+# Run init.sql to create tables and seed data
+echo "Creating tables and seeding data..."
+PGPASSWORD="${DB_PASS}" psql -U ${DB_USER} -d ${DB_NAME} -h localhost -f db/init.sql
 
+# Install Node.js dependencies
 echo "Installing dependencies..."
+cd backend
 npm install
 
 echo ""
-echo "✓ Backend setup complete!"
-echo ""
-
-# Setup Frontend
-echo "🎨 Setting up Frontend..."
-cd ../frontend
-
-echo "Frontend is ready to serve!"
-echo ""
-
-cd ..
-
-echo "=============================="
-echo "✅ Setup Complete!"
-echo ""
-echo "Next steps:"
-echo ""
-echo "1. Start Backend Server:"
-echo "   cd server"
-echo "   npm run seed    # (first time only)"
-echo "   npm start"
-echo ""
-echo "2. Start Frontend (in another terminal):"
-echo "   cd frontend"
-echo ""
-echo "   # Option A: Python 3"
-echo "   python3 -m http.server 3000"
-echo ""
-echo "   # Option B: Node.js"
-echo "   npx http-server public -p 3000"
-echo ""
-echo "3. Open browser:"
-echo "   http://localhost:3000"
-echo ""
-echo "4. Login with:"
-echo "   Email: alice@example.com"
-echo "   Password: password123"
-echo ""
-echo "📚 For JMeter testing guide, see jmeter-scripts/README.md"
-echo "=============================="
+echo "=== Setup complete ==="
+echo "Start the app with: cd backend && npm start"
+echo "Open http://localhost:3000 in your browser"
