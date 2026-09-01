@@ -1,6 +1,6 @@
 # Tasks — JMeter Training App
 
-A simple task management app designed as a target for JMeter performance testing training.
+A simple task management app designed as a target for JMeter performance testing training. This app is delicate with minumum security, you can break it if you want but we will not help you fix it.
 
 ## Option 1: Native Install (recommended)
 
@@ -108,13 +108,32 @@ Login returns: `{ "token": "...", "user": { "id": 1, "username": "..." } }`
 | PUT | `/api/tasks/:id` | `{ "description": "...", "due_date": "YYYY-MM-DD", "status": "active" }` |
 | DELETE | `/api/tasks/:id` | — |
 
-### Utility (no token required)
+### Utility
 
-| Method | URL | Description |
-|--------|-----|-------------|
-| GET | `/health` | Returns `{ "status": "ok" }` |
-| GET | `/api/slow?delay=2000` | Waits `delay` ms (max 10000) then responds |
-| POST | `/api/reset-and-reseed` | Wipes all data and re-seeds 5 users with 5 tasks each |
+| Method | URL | Auth | Description |
+|--------|-----|------|-------------|
+| GET | `/health` | No | Returns `{ "status": "ok" }` |
+| GET | `/api/slow?delay=2000` | No | Waits `delay` ms (max 10 000) then responds |
+| GET | `/api/flaky?error_rate=50` | Yes | Randomly fails — see below |
+| POST | `/api/reset-and-reseed` | No | Wipes all data and re-seeds 5 users with 5 tasks each |
+
+#### `/api/flaky`
+
+Simulates an unreliable endpoint for error-handling exercises.
+
+| Parameter | Type | Default | Behaviour |
+|-----------|------|---------|-----------|
+| `error_rate` | integer 0–100 | `50` | % chance the request fails. Invalid or out-of-range values → `100` |
+
+On **error** (random from `500 / 503 / 429`):
+```json
+{ "error": true, "message": "Simulated error (status 503)" }
+```
+
+On **success**:
+```json
+{ "status": "ok", "error_rate": 50 }
+```
 
 ## Database Credentials
 
