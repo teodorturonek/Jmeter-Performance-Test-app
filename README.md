@@ -75,7 +75,20 @@ npm start
 
 ### Access
 
-Open http://localhost:3000 in your browser. Everything (frontend + API) runs on a single port.
+| What | URL |
+|------|-----|
+| App | http://localhost:3000 |
+| Swagger UI | http://localhost:3000/api-docs |
+
+### Stopping the App
+
+Press `Ctrl+C` in the terminal running `npm start`.
+
+If the process is unresponsive (e.g. after a heavy load test):
+
+```bash
+kill $(lsof -t -i:3000)
+```
 
 ---
 
@@ -90,7 +103,7 @@ Open http://localhost:3000 in your browser. Everything (frontend + API) runs on 
 
 ```bash
 git clone <repo-url>
-cd JmeterTrainingAppv3
+cd JmeterTrainingApp
 docker compose up --build
 ```
 
@@ -100,6 +113,7 @@ docker compose up --build
 |------|-----|
 | Frontend (via nginx) | http://localhost |
 | API (direct) | http://localhost:3000 |
+| Swagger UI | http://localhost/api-docs |
 
 ### Docker Commands
 

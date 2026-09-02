@@ -3,11 +3,15 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 const morgan = require('morgan');
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('js-yaml');
 
 const authRoutes = require('./routes/auth');
 const taskRoutes = require('./routes/tasks');
 const utilityRoutes = require('./routes/utility');
 const authMiddleware = require('./middleware/auth');
+
+const swaggerDocument = yaml.load(fs.readFileSync(path.join(__dirname, 'swagger.yaml'), 'utf8'));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -18,6 +22,9 @@ const serveFrontend = fs.existsSync(FRONTEND_DIR);
 app.use(cors({ origin: 'http://localhost' }));
 app.use(morgan('dev'));
 app.use(express.json());
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Utility routes (no /api prefix for health, /api prefix for slow and reset)
 app.use(utilityRoutes);
