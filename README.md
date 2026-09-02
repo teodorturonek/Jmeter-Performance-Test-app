@@ -10,7 +10,11 @@ A simple task management app designed as a target for JMeter performance testing
 - [PostgreSQL 16](https://www.postgresql.org/download/)
 - [Git](https://git-scm.com/)
 
-### Quick Start
+---
+
+### Mac / Linux
+
+#### Quick Start
 
 ```bash
 git clone <repo-url>
@@ -19,7 +23,7 @@ cd JMeterTrainingApp
 cd backend && npm start
 ```
 
-The setup script creates the database, tables, and seed data. If `setup.sh` doesn't work on your machine, run the steps manually:
+The setup script creates the database, tables, and seed data. If `setup.sh` doesn't work, run the steps manually:
 
 ```bash
 # 1. Create PostgreSQL user and database
@@ -34,6 +38,40 @@ cd backend
 npm install
 npm start
 ```
+
+---
+
+### Windows
+
+#### Quick Start
+
+Open PowerShell as Administrator and run:
+
+```powershell
+git clone <repo-url>
+cd JMeterTrainingApp
+.\setup.ps1
+cd backend; npm start
+```
+
+ If the script doesn't work, run the steps manually:
+
+```powershell
+# 1. Create PostgreSQL user and database
+psql -U postgres -c "CREATE USER tasks_user WITH PASSWORD 'tasks_pass';"
+psql -U postgres -c "CREATE DATABASE tasks_db OWNER tasks_user;"
+
+# 2. Create tables and seed data
+$env:PGPASSWORD = "tasks_pass"
+psql -U tasks_user -d tasks_db -h localhost -f db/init.sql
+
+# 3. Install dependencies and start
+cd backend
+npm install
+npm start
+```
+
+---
 
 ### Access
 
