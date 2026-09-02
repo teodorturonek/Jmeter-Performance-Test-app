@@ -14,7 +14,7 @@ A simple task management app designed as a target for JMeter performance testing
 
 ```bash
 git clone <repo-url>
-cd JmeterTrainingAppv3
+cd JmeterTrainingApp
 ./setup.sh
 cd backend && npm start
 ```
