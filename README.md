@@ -145,10 +145,14 @@ The app starts with 5 pre-created users, each with 5 tasks:
 
 | Method | URL | Body |
 |--------|-----|------|
+| GET | `/api/auth/csrf` | — |
 | POST | `/api/auth/register` | `{ "username": "...", "password": "..." }` |
-| POST | `/api/auth/login` | `{ "username": "...", "password": "..." }` |
+| POST | `/api/auth/login` | `{ "username": "...", "password": "...", "csrfToken": "..." }` |
 
-Login returns: `{ "token": "...", "user": { "id": 1, "username": "..." } }`
+**Login Flow (for correlation practice):**
+1. `GET /api/auth/csrf` → returns `{ "csrfToken": "abc123..." }`
+2. Extract `csrfToken` from response
+3. `POST /api/auth/login` with `csrfToken` in body → returns `{ "token": "...", "user": {...} }`
 
 ### Tasks (requires `Authorization: Bearer <token>` header)
 

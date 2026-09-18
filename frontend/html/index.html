@@ -16,6 +16,7 @@
             <h5 class="card-title">Login</h5>
             <div id="error" class="text-danger mb-3" style="display:none;"></div>
             <form id="loginForm">
+              <input type="hidden" id="csrfToken" name="csrfToken" value="">
               <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" required>
@@ -38,6 +39,21 @@
   <script>
     redirectIfLoggedIn();
 
+    let csrfToken = '';
+
+    // Fetch CSRF token on page load
+    async function fetchCsrfToken() {
+      try {
+        const res = await fetch('/api/auth/csrf');
+        const data = await res.json();
+        csrfToken = data.csrfToken;
+        document.getElementById('csrfToken').value = csrfToken;
+      } catch (err) {
+        console.error('Failed to fetch CSRF token');
+      }
+    }
+    fetchCsrfToken();
+
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       hideError('error');
@@ -48,12 +64,14 @@
       try {
         const res = await apiFetch('/auth/login', {
           method: 'POST',
-          body: JSON.stringify({ username, password }),
+          body: JSON.stringify({ username, password, csrfToken }),
         });
         const data = await res.json();
 
         if (!res.ok) {
           showError('error', data.message);
+          // Refresh CSRF token on failure
+          fetchCsrfToken();
           return;
         }
 
