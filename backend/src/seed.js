@@ -43,7 +43,7 @@ async function resetAndReseed(pool) {
     await client.query('DELETE FROM tasks');
     await client.query('DELETE FROM users');
     await client.query("ALTER SEQUENCE users_id_seq RESTART WITH 1");
-    await client.query("ALTER SEQUENCE tasks_id_seq RESTART WITH 1");
+    await client.query("ALTER SEQUENCE task_id_seq RESTART WITH 1");
 
     for (const user of SEED_USERS) {
       const hash = await bcrypt.hash(user.password, 10);
@@ -55,12 +55,15 @@ async function resetAndReseed(pool) {
 
     for (let i = 0; i < SEED_TASKS.length; i++) {
       const userId = Math.floor(i / 5) + 1;
+      const taskId = `TASK-${String(i + 1).padStart(3, '0')}`;
       const [description, dueDate, status] = SEED_TASKS[i];
       await client.query(
-        'INSERT INTO tasks (user_id, description, due_date, status) VALUES ($1, $2, $3, $4)',
-        [userId, description, dueDate, status]
+        'INSERT INTO tasks (task_id, user_id, description, due_date, status) VALUES ($1, $2, $3, $4, $5)',
+        [taskId, userId, description, dueDate, status]
       );
     }
+
+    await client.query("ALTER SEQUENCE task_id_seq RESTART WITH 26");
 
     await client.query('COMMIT');
   } catch (err) {
