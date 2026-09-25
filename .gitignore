@@ -15,3 +15,5 @@ data/users.json
 data/tasks.json
 data/attachments.json
 uploads/
+deck/
+JMeter Scripts/

@@ -129,15 +129,15 @@ docker compose up --build
 
 ## Seed Users
 
-The app starts with 5 pre-created users, each with 5 tasks:
+The app starts with 5 pre-created users, each with 5 tasks (TASK-001 to TASK-025):
 
-| Username | Password |
-|----------|----------|
-| user1 | password1 |
-| user2 | password2 |
-| user3 | password3 |
-| user4 | password4 |
-| user5 | password5 |
+| Username | Password | Tasks |
+|----------|----------|-------|
+| user1 | password1 | TASK-001 to TASK-005 |
+| user2 | password2 | TASK-006 to TASK-010 |
+| user3 | password3 | TASK-011 to TASK-015 |
+| user4 | password4 | TASK-016 to TASK-020 |
+| user5 | password5 | TASK-021 to TASK-025 |
 
 ## API Endpoints
 
@@ -145,20 +145,29 @@ The app starts with 5 pre-created users, each with 5 tasks:
 
 | Method | URL | Body |
 |--------|-----|------|
+| GET | `/api/auth/csrf` | — |
 | POST | `/api/auth/register` | `{ "username": "...", "password": "..." }` |
-| POST | `/api/auth/login` | `{ "username": "...", "password": "..." }` |
+| POST | `/api/auth/login` | `{ "username": "...", "password": "...", "csrfToken": "..." }` |
 
-Login returns: `{ "token": "...", "user": { "id": 1, "username": "..." } }`
+**Login Flow (for correlation practice):**
+1. `GET /api/auth/csrf` → returns `{ "csrfToken": "abc123..." }`
+2. Extract `csrfToken` from response
+3. `POST /api/auth/login` with `csrfToken` in body → returns `{ "token": "...", "user": {...} }`
 
 ### Tasks (requires `Authorization: Bearer <token>` header)
 
 | Method | URL | Body |
 |--------|-----|------|
 | GET | `/api/tasks?page=1` | — |
-| GET | `/api/tasks/:id` | — |
+| GET | `/api/tasks/search?q=...` | — |
+| GET | `/api/tasks/:task_id` | — |
 | POST | `/api/tasks` | `{ "description": "...", "due_date": "YYYY-MM-DD", "status": "active" }` |
-| PUT | `/api/tasks/:id` | `{ "description": "...", "due_date": "YYYY-MM-DD", "status": "active" }` |
-| DELETE | `/api/tasks/:id` | — |
+| PUT | `/api/tasks/:task_id` | `{ "description": "...", "due_date": "YYYY-MM-DD", "status": "active" }` |
+| DELETE | `/api/tasks/:task_id` | — |
+
+**Task ID:** Each task has a unique `task_id` (e.g., `TASK-001`) auto-generated on creation.
+
+**Search:** Use `/api/tasks/search?q=<query>` to search by `task_id` or `description` (case-insensitive).
 
 ### Utility
 

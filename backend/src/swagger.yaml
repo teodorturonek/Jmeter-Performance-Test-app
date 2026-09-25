@@ -24,9 +24,9 @@ components:
     Task:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
+        task_id:
+          type: string
+          example: TASK-001
         description:
           type: string
           maxLength: 200
@@ -77,6 +77,26 @@ paths:
 
   # ── Auth ────────────────────────────────────────────────────────────────────
 
+  /api/auth/csrf:
+    get:
+      summary: Get CSRF token
+      description: >
+        Returns a one-time CSRF token that must be included in the login request.
+        Token expires after 5 minutes. This endpoint is designed to teach
+        correlation — students must extract the token and pass it to /login.
+      tags: [Auth]
+      responses:
+        "200":
+          description: CSRF token generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  csrfToken:
+                    type: string
+                    example: a1b2c3d4e5f6...
+
   /api/auth/register:
     post:
       summary: Register a new user
@@ -125,7 +145,8 @@ paths:
     post:
       summary: Login
       description: >
-        Authenticates a user and returns a JWT token. Pass the token as
+        Authenticates a user and returns a JWT token. **Requires a valid CSRF
+        token** obtained from `/api/auth/csrf`. Pass the JWT token as
         `Authorization: Bearer <token>` on all protected endpoints.
       tags: [Auth]
       requestBody:
@@ -134,7 +155,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [username, password]
+              required: [username, password, csrfToken]
               properties:
                 username:
                   type: string
@@ -142,6 +163,10 @@ paths:
                 password:
                   type: string
                   example: password1
+                csrfToken:
+                  type: string
+                  description: One-time token from /api/auth/csrf
+                  example: a1b2c3d4e5f6...
       responses:
         "200":
           description: Login successful — use the returned token for protected endpoints
@@ -168,8 +193,50 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "403":
+          description: Invalid or missing CSRF token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   # ── Tasks ───────────────────────────────────────────────────────────────────
+
+  /api/tasks/search:
+    get:
+      summary: Search tasks
+      description: Search tasks by task_id or description. Returns all matching tasks for the authenticated user.
+      tags: [Tasks]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema:
+            type: string
+          description: Search query (matches task_id or description)
+      responses:
+        "200":
+          description: List of matching tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Task"
+        "400":
+          description: Missing search query
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /api/tasks:
     get:
@@ -247,20 +314,20 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /api/tasks/{id}:
+  /api/tasks/{task_id}:
     get:
       summary: Get a task
-      description: Returns a single task by ID. Only returns tasks belonging to the authenticated user.
+      description: Returns a single task by task_id. Only returns tasks belonging to the authenticated user.
       tags: [Tasks]
       security:
         - bearerAuth: []
       parameters:
         - in: path
-          name: id
+          name: task_id
           required: true
           schema:
-            type: integer
-          example: 1
+            type: string
+          example: TASK-001
       responses:
         "200":
           description: Task found
@@ -289,11 +356,11 @@ paths:
         - bearerAuth: []
       parameters:
         - in: path
-          name: id
+          name: task_id
           required: true
           schema:
-            type: integer
-          example: 1
+            type: string
+          example: TASK-001
       requestBody:
         required: true
         content:
@@ -347,11 +414,11 @@ paths:
         - bearerAuth: []
       parameters:
         - in: path
-          name: id
+          name: task_id
           required: true
           schema:
-            type: integer
-          example: 1
+            type: string
+          example: TASK-001
       responses:
         "200":
           description: Task deleted
