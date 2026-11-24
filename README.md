@@ -1,18 +1,22 @@
 # Tasks — JMeter Training App
 
-A simple task management app designed as a target for JMeter performance testing training. This app is delicate with minumum security, you can break it if you want but we will not help you fix it.
-
-## Option 1: Native Install (recommended)
-
-### Prerequisites
-
-- [Node.js 20+](https://nodejs.org/)
-- [PostgreSQL 16](https://www.postgresql.org/download/)
-- [Git](https://git-scm.com/)
+A simple task management app built as a target for JMeter performance testing training. It is intentionally lightweight with minimal security — designed to be tested hard.
 
 ---
 
-### Mac / Linux
+## Option 1: Native Install
+
+### Prerequisites
+
+| Software | Version | Download |
+|----------|---------|----------|
+| Node.js | 20+ | https://nodejs.org/ |
+| PostgreSQL | 16 | https://www.postgresql.org/download/ |
+| Git | Any | https://git-scm.com/ |
+
+---
+
+### Mac
 
 #### Quick Start
 
@@ -23,20 +27,29 @@ cd JMeterTrainingApp
 cd backend && npm start
 ```
 
-The setup script creates the database, tables, and seed data. If `setup.sh` doesn't work, run the steps manually:
+The setup script creates the database user, tables, and seed data, then installs Node.js dependencies.
+
+> **Homebrew PostgreSQL note:** Homebrew installs PostgreSQL with your macOS username as the superuser, not `postgres`. If `psql -U postgres` fails, try `psql -U $(whoami)` instead. The `setup.sh` script detects this automatically.
+
+If the script fails, run the steps manually:
 
 ```bash
-# 1. Create PostgreSQL user and database
+# Create user and database
 psql -U postgres -c "CREATE USER tasks_user WITH PASSWORD 'tasks_pass';"
 psql -U postgres -c "CREATE DATABASE tasks_db OWNER tasks_user;"
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE tasks_db TO tasks_user;"
 
-# 2. Create tables and seed data
-psql -U tasks_user -d tasks_db -f db/init.sql
+# Create tables and seed data
+PGPASSWORD="tasks_pass" psql -U tasks_user -d tasks_db -h localhost -f db/init.sql
 
-# 3. Install dependencies and start
-cd backend
-npm install
-npm start
+# Install dependencies
+cd backend && npm install
+```
+
+**Verify PostgreSQL is running before setup:**
+```bash
+pg_isready
+# Expected: /tmp/.s.PGSQL.5432 - accepting connections
 ```
 
 ---
@@ -45,7 +58,7 @@ npm start
 
 #### Quick Start
 
-Open PowerShell as Administrator and run:
+Open **PowerShell as Administrator** (right-click PowerShell → Run as Administrator) and run:
 
 ```powershell
 git clone <repo-url>
@@ -54,40 +67,50 @@ cd JMeterTrainingApp
 cd backend; npm start
 ```
 
- If the script doesn't work, run the steps manually:
+The setup script creates the database user, tables, and seed data, then installs Node.js dependencies.
+
+> **PostgreSQL PATH note:** After installing PostgreSQL, add `C:\Program Files\PostgreSQL\16\bin` to your system PATH so `psql` is available in PowerShell. Open a new PowerShell window after updating PATH.
+
+If the script fails, run the steps manually in PowerShell as Administrator:
 
 ```powershell
-# 1. Create PostgreSQL user and database
+# Create user and database (enter your postgres password when prompted)
 psql -U postgres -c "CREATE USER tasks_user WITH PASSWORD 'tasks_pass';"
 psql -U postgres -c "CREATE DATABASE tasks_db OWNER tasks_user;"
+psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE tasks_db TO tasks_user;"
 
-# 2. Create tables and seed data
+# Create tables and seed data
 $env:PGPASSWORD = "tasks_pass"
 psql -U tasks_user -d tasks_db -h localhost -f db/init.sql
 
-# 3. Install dependencies and start
+# Install dependencies
 cd backend
 npm install
-npm start
 ```
 
 ---
 
-### Access
+### Access (Native)
 
 | What | URL |
 |------|-----|
 | App | http://localhost:3000 |
 | Swagger UI | http://localhost:3000/api-docs |
 
-### Stopping the App
+### Stopping the App (Native)
 
 Press `Ctrl+C` in the terminal running `npm start`.
 
-If the process is unresponsive (e.g. after a heavy load test):
+If the process is unresponsive after a heavy load test:
 
+**Mac/Linux:**
 ```bash
 kill $(lsof -t -i:3000)
+```
+
+**Windows (PowerShell):**
+```powershell
+Stop-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess -Force
 ```
 
 ---
@@ -96,18 +119,24 @@ kill $(lsof -t -i:3000)
 
 ### Prerequisites
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Git](https://git-scm.com/)
+| Software | Download |
+|----------|----------|
+| Docker Desktop | https://www.docker.com/products/docker-desktop/ |
+| Git | https://git-scm.com/ |
+
+Docker Desktop bundles everything needed — no separate Node.js or PostgreSQL install required.
 
 ### Quick Start
 
 ```bash
 git clone <repo-url>
-cd JmeterTrainingApp
+cd JMeterTrainingApp
 docker compose up --build
 ```
 
-### Access
+> **Windows:** During Docker Desktop install, ensure **WSL 2** is selected when prompted. Restart your machine if required before running the above.
+
+### Access (Docker)
 
 | What | URL |
 |------|-----|
@@ -119,7 +148,7 @@ docker compose up --build
 
 | Command | What it does |
 |---------|-------------|
-| `docker compose up --build` | Build and start (first time) |
+| `docker compose up --build` | Build and start (first time or after code changes) |
 | `docker compose up` | Start (after first build) |
 | `docker compose down` | Stop all containers |
 | `docker compose down --rmi all` | Stop and remove all images (full clean) |
@@ -127,9 +156,46 @@ docker compose up --build
 
 ---
 
+## Verifying Your Setup
+
+| Check | How | Expected result |
+|-------|-----|-----------------|
+| App is up | Open http://localhost (Docker) or http://localhost:3000 (native) | Login page appears |
+| API is healthy | Open http://localhost/health or http://localhost:3000/health | `{"status":"ok"}` |
+| Swagger UI works | Open http://localhost/api-docs or http://localhost:3000/api-docs | Swagger UI loads |
+| Login works | Log in with `user1` / `password1` | Task list appears |
+
+**Check ports are free before starting:**
+
+Mac/Linux:
+```bash
+lsof -i :3000
+lsof -i :80
+```
+
+Windows (PowerShell):
+```powershell
+netstat -ano | findstr :3000
+netstat -ano | findstr :80
+```
+
+No output means the port is free. If a process is listed, quit that application before starting the app.
+
+---
+
+## Resetting the Database
+
+To wipe all data and re-seed the original 10 users and 50 tasks:
+
+```bash
+curl -X POST http://localhost:3000/api/reset-and-reseed
+```
+
+---
+
 ## Seed Users
 
-The app starts with 5 pre-created users, each with 5 tasks (TASK-001 to TASK-025):
+The app starts with 10 pre-created users, each with 5 tasks (TASK-001 to TASK-050):
 
 | Username | Password | Tasks |
 |----------|----------|-------|
@@ -138,6 +204,13 @@ The app starts with 5 pre-created users, each with 5 tasks (TASK-001 to TASK-025
 | user3 | password3 | TASK-011 to TASK-015 |
 | user4 | password4 | TASK-016 to TASK-020 |
 | user5 | password5 | TASK-021 to TASK-025 |
+| user6 | password6 | TASK-026 to TASK-030 |
+| user7 | password7 | TASK-031 to TASK-035 |
+| user8 | password8 | TASK-036 to TASK-040 |
+| user9 | password9 | TASK-041 to TASK-045 |
+| user10 | password10 | TASK-046 to TASK-050 |
+
+---
 
 ## API Endpoints
 
@@ -149,7 +222,7 @@ The app starts with 5 pre-created users, each with 5 tasks (TASK-001 to TASK-025
 | POST | `/api/auth/register` | `{ "username": "...", "password": "..." }` |
 | POST | `/api/auth/login` | `{ "username": "...", "password": "...", "csrfToken": "..." }` |
 
-**Login Flow (for correlation practice):**
+**Login Flow:**
 1. `GET /api/auth/csrf` → returns `{ "csrfToken": "abc123..." }`
 2. Extract `csrfToken` from response
 3. `POST /api/auth/login` with `csrfToken` in body → returns `{ "token": "...", "user": {...} }`
@@ -165,7 +238,7 @@ The app starts with 5 pre-created users, each with 5 tasks (TASK-001 to TASK-025
 | PUT | `/api/tasks/:task_id` | `{ "description": "...", "due_date": "YYYY-MM-DD", "status": "active" }` |
 | DELETE | `/api/tasks/:task_id` | — |
 
-**Task ID:** Each task has a unique `task_id` (e.g., `TASK-001`) auto-generated on creation.
+**Task ID:** Each task has a unique `task_id` (e.g. `TASK-001`) auto-generated on creation.
 
 **Search:** Use `/api/tasks/search?q=<query>` to search by `task_id` or `description` (case-insensitive).
 
@@ -174,9 +247,9 @@ The app starts with 5 pre-created users, each with 5 tasks (TASK-001 to TASK-025
 | Method | URL | Auth | Description |
 |--------|-----|------|-------------|
 | GET | `/health` | No | Returns `{ "status": "ok" }` |
-| GET | `/api/slow?delay=2000` | No | Waits `delay` ms (max 10 000) then responds |
+| GET | `/api/slow?delay=2000` | No | Waits `delay` ms (max 10,000) then responds |
 | GET | `/api/flaky?error_rate=50` | Yes | Randomly fails — see below |
-| POST | `/api/reset-and-reseed` | No | Wipes all data and re-seeds 5 users with 5 tasks each |
+| POST | `/api/reset-and-reseed` | No | Wipes all data and re-seeds 10 users with 50 tasks |
 
 #### `/api/flaky`
 
@@ -196,15 +269,19 @@ On **success**:
 { "status": "ok", "error_rate": 50 }
 ```
 
+---
+
 ## Database Credentials
 
 | Setting | Value |
 |---------|-------|
-| Host | localhost (or `db` from within Docker) |
-| Port | 5432 |
-| Database | tasks_db |
-| User | tasks_user |
-| Password | tasks_pass |
+| Host | `localhost` (or `db` from within Docker) |
+| Port | `5432` |
+| Database | `tasks_db` |
+| User | `tasks_user` |
+| Password | `tasks_pass` |
+
+---
 
 ## Architecture
 

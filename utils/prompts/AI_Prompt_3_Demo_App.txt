@@ -1,0 +1,48 @@
+You are a JMeter expert. Create a complete JMeter JMX test script for a
+Task Management app running at http://localhost:3000
+
+THE APP HAS THESE ENDPOINTS:
+- GET  /api/auth/csrf          → gets a CSRF token (no login needed)
+- POST /api/auth/login         → logs in, returns a Bearer token
+- GET  /api/tasks?page=1       → lists tasks (login required)
+- GET  /api/tasks/search?q=... → searches tasks (login required)
+- POST /api/tasks              → creates a task (login required)
+- PUT  /api/tasks/:task_id     → updates a task (login required)
+- DELETE /api/tasks/:task_id   → deletes a task (login required)
+
+LOGIN WORKS LIKE THIS:
+1. First call GET /api/auth/csrf to get a csrfToken
+2. Then call POST /api/auth/login with username, password and csrfToken
+3. Login returns a token — use it as: Authorization: Bearer <token>
+
+TEST USERS (use these in a CSV file called users.csv):
+user1, password1
+user2, password2
+user3, password3
+
+SEARCH TERMS (use these in a CSV file called search_queries.csv):
+TASK-001, active, completed
+
+WHAT I WANT THE TEST TO DO:
+1. Get CSRF token
+2. Login and save the token
+3. List tasks
+4. Search for a task using a term from the CSV
+5. Create a new task
+6. Update the task that was just created
+7. Delete the task that was just created
+
+SETTINGS:
+- 10 virtual users
+- Start all users over 30 seconds
+- Each user repeats the journey 3 times
+
+PLEASE INCLUDE:
+- Assertions to check each request returned a success response
+- Check that login actually returned a token
+- Check that task creation returned a task ID
+- Flag any response that takes longer than 2 seconds
+- Save results to results/test_run_1.jtl
+- Add a step at the end that resets the database: POST /api/reset-and-reseed
+
+Output a complete JMX file ready to open in JMeter.

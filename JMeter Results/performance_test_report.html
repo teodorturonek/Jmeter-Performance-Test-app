@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en-GB" dir="ltr">
+<head>
+<meta charset="utf-8"><meta name="MSRAI_Label_dbd012e0-e600-4c3e-83b7-7d3141c15efc_AI_Disclosure" content="Made with AI">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Performance Test Report — Normal vs Heavy Load</title>
+<style>
+:root{
+  --purple:#6B2D8B; --purple-dark:#4E1F66; --blue:#00A9CE; --red:#D93F3F; --amber:#E8A317; --green:#2E9E5B;
+  --ink:#1F1A24; --muted:#5E5768; --bg:#F5F3F8; --card:#FFFFFF; --line:#E4DEEB;
+  --red-bg:#FDECEC; --amber-bg:#FFF6E0; --green-bg:#E7F6EC; --stripe:#FAF8FC; --label-bg:rgba(255,255,255,.92); --line-col:#6B2D8B; --head:#4E1F66;
+}
+@media (prefers-color-scheme: dark){:root{--ink:#EEE9F3;--muted:#B7AEC2;--bg:#16121A;--card:#221C29;--line:#3A3243;--stripe:#2A2332;--red-bg:#3D1C1F;--amber-bg:#3A2E12;--green-bg:#173323;--label-bg:rgba(34,28,41,.92);--line-col:#C99BE0;--head:#D9B8EA}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(120deg,var(--purple) 0%,var(--purple-dark) 55%,var(--blue) 140%);color:#fff;padding-block:40px 64px;padding-inline:20px}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:20px}
+header .wrap{padding-inline:0}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;opacity:.85;margin:0 0 6px}
+h1{margin:0 0 8px;font-size:clamp(1.6rem,3.5vw,2.4rem);line-height:1.2}
+.sub{margin:0;opacity:.9;font-size:.98rem}
+main{margin-block-start:-40px}
+section{background:var(--card);border-radius:16px;box-shadow:0 6px 24px rgba(75,31,102,.08);padding:28px;margin-block-end:24px}
+h2{margin:0 0 6px;font-size:1.35rem;color:var(--purple)}
+h2 .num{display:inline-flex;align-items:center;justify-content:center;inline-size:30px;block-size:30px;border-radius:50%;background:var(--blue);color:#fff;font-size:.9rem;margin-inline-end:10px;vertical-align:middle}
+.lead{color:var(--muted);margin:0 0 18px;font-size:.95rem}
+.verdict{font-size:1.08rem;margin:6px 0 20px}
+.verdict strong{color:var(--red)}
+.badges{display:flex;flex-wrap:wrap;gap:14px}
+.badge{flex:1 1 200px;border-radius:12px;padding:16px 18px;color:#fff;display:flex;align-items:center;gap:14px}
+.badge .dot{inline-size:44px;block-size:44px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0}
+.badge .k{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;opacity:.9}
+.badge .v{font-size:1.15rem;font-weight:700}
+.badge .d{font-size:.85rem;opacity:.95}
+.bg-red{background:var(--red)} .bg-amber{background:var(--amber)} .bg-green{background:var(--green)}
+.legend-key{display:flex;flex-wrap:wrap;gap:16px;margin-block-start:14px;font-size:.85rem;color:var(--muted)}
+.legend-key span::before{content:"";display:inline-block;inline-size:10px;block-size:10px;border-radius:50%;margin-inline-end:6px;vertical-align:middle;background:var(--c)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.card{border:1px solid var(--line);border-radius:14px;padding:20px;border-block-start:6px solid var(--c);background:var(--card)}
+.card .title{font-size:.82rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px}
+.card .pair{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.card .big{font-size:1.9rem;font-weight:700;line-height:1.1}
+.card .lbl{font-size:.78rem;color:var(--muted)}
+.card .arrow{font-size:1.3rem;color:var(--muted);padding-block-end:14px}
+.card .name{font-size:1.4rem;font-weight:700;color:var(--purple);margin:0 0 4px}
+.pill{display:inline-block;margin-block-start:12px;padding:4px 10px;border-radius:999px;font-size:.78rem;font-weight:600;background:var(--pbg);color:var(--c)}
+.card p.note{margin:10px 0 0;font-size:.86rem;color:var(--muted)}
+.c-red{--c:var(--red);--pbg:var(--red-bg)} .c-amber{--c:#B97F06;--pbg:var(--amber-bg)} .c-green{--c:var(--green);--pbg:var(--green-bg)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:24px}
+.chart-box{border:1px solid var(--line);border-radius:14px;padding:18px}
+.chart-box h3{margin:0 0 4px;font-size:1.05rem;color:var(--head)}
+.chart-box p{margin:0 0 12px;font-size:.86rem;color:var(--muted)}
+.chart{display:block;inline-size:100%;block-size:auto;font-family:"Segoe UI",system-ui,sans-serif}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .tick,.chart .cat,.chart .leg{fill:var(--muted);font-size:13px}
+.chart .axis{fill:var(--muted);font-size:13px;font-weight:600}
+.chart .val{fill:var(--ink);font-size:12px;font-weight:600}
+.chart .limit{stroke:var(--line-col);stroke-width:2.5;stroke-dasharray:8 6}
+.chart .limitbg{fill:var(--label-bg)}
+.chart .limittext{fill:var(--line-col);font-size:13px;font-weight:700}
+.chart .slice{stroke:var(--card);stroke-width:3}
+.chart .slicetext{fill:#fff;font-size:22px;font-weight:700}
+@media (max-width:600px){.chart .cat{font-size:15px}}
+.full{grid-column:1/-1}
+table{inline-size:100%;border-collapse:collapse;font-size:.92rem}
+.table-scroll{overflow-x:auto}
+th{background:var(--purple);color:#fff;text-align:start;padding:11px 12px;font-weight:600}
+th:first-child{border-start-start-radius:10px} th:last-child{border-start-end-radius:10px}
+td{padding:11px 12px;border-block-end:1px solid var(--line)}
+tr:nth-child(even) td{background:var(--stripe)}
+td.num{font-variant-numeric:tabular-nums}
+.good{color:var(--green);font-weight:600} .warn{color:#B97F06;font-weight:600} .bad{color:var(--red);font-weight:600}
+.result{font-weight:700;white-space:nowrap}
+.rule{margin:12px 0 0;font-size:.85rem;color:var(--muted)}
+.story p{margin:0 0 14px;font-size:1rem}
+.story h3{margin:18px 0 4px;font-size:1.02rem;color:var(--head)}
+.fixes{display:grid;gap:14px}
+.fix{display:flex;gap:16px;border:1px solid var(--line);border-radius:14px;padding:18px;border-inline-start:6px solid var(--c)}
+.fix .icon{font-size:1.8rem;line-height:1}
+.fix h3{margin:0 0 6px;font-size:1.05rem}
+.fix p{margin:0 0 4px;font-size:.94rem}
+.fix .tag{font-weight:700;color:var(--purple)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-block-start:20px}
+.meta div{background:var(--bg);border-radius:10px;padding:12px 14px;font-size:.86rem}
+.meta b{display:block;color:var(--purple);font-size:1.05rem}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding-block:10px 40px}
+@media (max-width:600px){section{padding:20px}}
+@media print{header{print-color-adjust:exact;-webkit-print-color-adjust:exact}section{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Performance Test Report</p>
+    <h1>How the Task App Coped: Normal Load vs Heavy Load</h1>
+    <p class="sub">Normal run: 5 users at once, 105 requests over about 2 minutes &nbsp;•&nbsp; Heavy run: 50 users at once, 1,050 requests over about 7 minutes</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- 1. SUMMARY -->
+<section>
+  <h2><span class="num">1</span>The Short Version</h2>
+  <p class="verdict">Under normal load the app worked well: every request succeeded and pages answered in about <b>0.16 seconds</b>. Under heavy load it <strong>failed</strong>. The average answer took <b>3.0 seconds</b>, well over our 2-second limit, and <b>almost 1 in 5 requests (18.1%) failed</b>. On this evidence the app is <strong>not ready</strong> for busy, real-world traffic.</p>
+  <div class="badges">
+    <div class="badge bg-red"><div class="dot">⏱️</div><div><div class="k">Speed</div><div class="v">Failed</div><div class="d">3.0 s average under heavy load (limit 2 s)</div></div></div>
+    <div class="badge bg-red"><div class="dot">⚠️</div><div><div class="k">Errors</div><div class="v">Failed</div><div class="d">18.1% of requests failed (limit 5%)</div></div></div>
+    <div class="badge bg-red"><div class="dot">🚦</div><div><div class="k">Overall</div><div class="v">Not Ready</div><div class="d">Fine for light use, breaks under pressure</div></div></div>
+  </div>
+  <div class="legend-key">
+    <span style="--c:var(--green)">Green = good</span>
+    <span style="--c:var(--amber)">Amber = needs attention</span>
+    <span style="--c:var(--red)">Red = failed</span>
+  </div>
+  <div class="meta">
+    <div><b>2,000 ms (2 s)</b>Maximum acceptable average response time</div>
+    <div><b>Under 5%</b>Acceptable error rate</div>
+    <div><b>1 ms = 1/1000 s</b>So 1,000 ms is 1 second</div>
+  </div>
+</section>
+
+<!-- 2. SCORE CARDS -->
+<section>
+  <h2><span class="num">2</span>Score Cards</h2>
+  <p class="lead">Each card shows the result with a small number of users (normal) next to the result with a large number of users (heavy).</p>
+  <div class="cards">
+    <div class="card c-red">
+      <p class="title">Average Speed</p>
+      <div class="pair">
+        <div><div class="big good">162 ms</div><div class="lbl">Normal load</div></div>
+        <div class="arrow">→</div>
+        <div><div class="big bad">3,002 ms</div><div class="lbl">Heavy load</div></div>
+      </div>
+      <span class="pill">❌ About 18× slower</span>
+      <p class="note">Over half of all heavy-load requests (53%) took longer than 2 seconds.</p>
+    </div>
+    <div class="card c-red">
+      <p class="title">Error Rate</p>
+      <div class="pair">
+        <div><div class="big good">0%</div><div class="lbl">Normal load</div></div>
+        <div class="arrow">→</div>
+        <div><div class="big bad">18.1%</div><div class="lbl">Heavy load</div></div>
+      </div>
+      <span class="pill">❌ 190 of 1,050 failed</span>
+      <p class="note">Acceptable limit is under 5%.</p>
+    </div>
+    <div class="card c-green">
+      <p class="title">Fastest Endpoint (Heavy Load)</p>
+      <p class="name">Log Out</p>
+      <div class="pair">
+        <div><div class="big good">296 ms</div><div class="lbl">Heavy load (180 ms normal)</div></div>
+      </div>
+      <span class="pill">✅ Fast and reliable (0.7% errors)</span>
+      <p class="note">Fastest under normal load: Create Task at 126 ms.</p>
+    </div>
+    <div class="card c-red">
+      <p class="title">Slowest Endpoint (Heavy Load)</p>
+      <p class="name">Search Tasks</p>
+      <div class="pair">
+        <div><div class="big bad">6,414 ms</div><div class="lbl">Heavy load (173 ms normal)</div></div>
+      </div>
+      <span class="pill">❌ 46.7% of searches failed</span>
+      <p class="note">31 searches hit the 10-second time limit and gave up.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. CHARTS -->
+<section>
+  <h2><span class="num">3</span>The Charts</h2>
+  <p class="lead">An "endpoint" is one action the app performs, like logging in or searching.</p>
+  <div class="charts">
+    <div class="chart-box full">
+      <h3>Chart 1: Speed Comparison</h3>
+      <p>Average time to respond for each action. <b style="color:var(--blue)">Blue = normal load</b>, <b style="color:var(--red)">Red = heavy load</b>. Bars above the dotted line are too slow.</p>
+      <svg class="chart" viewBox="0 0 1000 420" role="img" aria-label="Speed comparison: average response time per endpoint, normal versus heavy load"><line class="grid" x1="70" x2="980" y1="330.0" y2="330.0"/><text class="tick" x="62" y="334.0" text-anchor="end">0</text><line class="grid" x1="70" x2="980" y1="285.7" y2="285.7"/><text class="tick" x="62" y="289.7" text-anchor="end">1,000</text><line class="grid" x1="70" x2="980" y1="241.4" y2="241.4"/><text class="tick" x="62" y="245.4" text-anchor="end">2,000</text><line class="grid" x1="70" x2="980" y1="197.1" y2="197.1"/><text class="tick" x="62" y="201.1" text-anchor="end">3,000</text><line class="grid" x1="70" x2="980" y1="152.9" y2="152.9"/><text class="tick" x="62" y="156.9" text-anchor="end">4,000</text><line class="grid" x1="70" x2="980" y1="108.6" y2="108.6"/><text class="tick" x="62" y="112.6" text-anchor="end">5,000</text><line class="grid" x1="70" x2="980" y1="64.3" y2="64.3"/><text class="tick" x="62" y="68.3" text-anchor="end">6,000</text><line class="grid" x1="70" x2="980" y1="20.0" y2="20.0"/><text class="tick" x="62" y="24.0" text-anchor="end">7,000</text><text class="axis" transform="translate(16 175.0) rotate(-90)" text-anchor="middle">Average response time (ms)</text><rect x="91.4" y="323.1" width="41.6" height="6.9" rx="4" fill="#00A9CE"><title>Get Security Token – Normal load: 156 ms</title></rect><text class="val" x="112.2" y="318.1" text-anchor="middle">156</text><rect x="137.0" y="286.7" width="41.6" height="43.3" rx="4" fill="#D93F3F"><title>Get Security Token – Heavy load: 977 ms</title></rect><text class="val" x="157.8" y="281.7" text-anchor="middle">977</text><text class="cat" x="135.0" y="350" text-anchor="middle">Get Security Token</text><rect x="221.4" y="322.0" width="41.6" height="8.0" rx="4" fill="#00A9CE"><title>Log In – Normal load: 180 ms</title></rect><text class="val" x="242.2" y="317.0" text-anchor="middle">180</text><rect x="267.0" y="222.2" width="41.6" height="107.8" rx="4" fill="#D93F3F"><title>Log In – Heavy load: 2,434 ms</title></rect><text class="val" x="287.8" y="217.2" text-anchor="middle">2,434</text><text class="cat" x="265.0" y="350" text-anchor="middle">Log In</text><rect x="351.4" y="322.3" width="41.6" height="7.7" rx="4" fill="#00A9CE"><title>Search Tasks – Normal load: 173 ms</title></rect><text class="val" x="372.2" y="317.3" text-anchor="middle">173</text><rect x="397.0" y="46.0" width="41.6" height="284.0" rx="4" fill="#D93F3F"><title>Search Tasks – Heavy load: 6,414 ms</title></rect><text class="val" x="417.8" y="41.0" text-anchor="middle">6,414</text><text class="cat" x="395.0" y="350" text-anchor="middle">Search Tasks</text><rect x="481.4" y="324.4" width="41.6" height="5.6" rx="4" fill="#00A9CE"><title>Create Task – Normal load: 126 ms</title></rect><text class="val" x="502.2" y="319.4" text-anchor="middle">126</text><rect x="527.0" y="144.9" width="41.6" height="185.1" rx="4" fill="#D93F3F"><title>Create Task – Heavy load: 4,180 ms</title></rect><text class="val" x="547.8" y="139.9" text-anchor="middle">4,180</text><text class="cat" x="525.0" y="350" text-anchor="middle">Create Task</text><rect x="611.4" y="322.6" width="41.6" height="7.4" rx="4" fill="#00A9CE"><title>Update Task – Normal load: 167 ms</title></rect><text class="val" x="632.2" y="317.6" text-anchor="middle">167</text><rect x="657.0" y="167.6" width="41.6" height="162.4" rx="4" fill="#D93F3F"><title>Update Task – Heavy load: 3,667 ms</title></rect><text class="val" x="677.8" y="162.6" text-anchor="middle">3,667</text><text class="cat" x="655.0" y="350" text-anchor="middle">Update Task</text><rect x="741.4" y="323.3" width="41.6" height="6.7" rx="4" fill="#00A9CE"><title>Delete Task – Normal load: 151 ms</title></rect><text class="val" x="762.2" y="318.3" text-anchor="middle">151</text><rect x="787.0" y="195.1" width="41.6" height="134.9" rx="4" fill="#D93F3F"><title>Delete Task – Heavy load: 3,046 ms</title></rect><text class="val" x="807.8" y="190.1" text-anchor="middle">3,046</text><text class="cat" x="785.0" y="350" text-anchor="middle">Delete Task</text><rect x="871.4" y="322.0" width="41.6" height="8.0" rx="4" fill="#00A9CE"><title>Log Out – Normal load: 180 ms</title></rect><text class="val" x="892.2" y="317.0" text-anchor="middle">180</text><rect x="917.0" y="316.9" width="41.6" height="13.1" rx="4" fill="#D93F3F"><title>Log Out – Heavy load: 296 ms</title></rect><text class="val" x="937.8" y="311.9" text-anchor="middle">296</text><text class="cat" x="915.0" y="350" text-anchor="middle">Log Out</text><line class="limit" x1="70" x2="980" y1="241.4" y2="241.4"/><rect class="limitbg" x="718" y="217.4" width="258" height="19" rx="3"/><text class="limittext" x="972" y="231.4" text-anchor="end">Maximum Acceptable Time (2,000 ms)</text><rect x="350.0" y="390" width="14" height="14" rx="3" fill="#00A9CE"/><text class="leg" x="370.0" y="402">Normal load (5 users)</text><rect x="520.0" y="390" width="14" height="14" rx="3" fill="#D93F3F"/><text class="leg" x="540.0" y="402">Heavy load (50 users)</text></svg>
+    </div>
+    <div class="chart-box">
+      <h3>Chart 2: Who Had the Most Errors?</h3>
+      <p>Share of requests that failed under heavy load. Green is under 5%, amber is 5–15%, red is over 15%. (Under normal load every action had 0% errors.)</p>
+      <svg class="chart" viewBox="0 0 560 360" role="img" aria-label="Error rate per endpoint under heavy load"><line class="grid" x1="140.0" x2="140.0" y1="10" y2="315"/><text class="tick" x="140.0" y="331" text-anchor="middle">0%</text><line class="grid" x1="214.0" x2="214.0" y1="10" y2="315"/><text class="tick" x="214.0" y="331" text-anchor="middle">10%</text><line class="grid" x1="288.0" x2="288.0" y1="10" y2="315"/><text class="tick" x="288.0" y="331" text-anchor="middle">20%</text><line class="grid" x1="362.0" x2="362.0" y1="10" y2="315"/><text class="tick" x="362.0" y="331" text-anchor="middle">30%</text><line class="grid" x1="436.0" x2="436.0" y1="10" y2="315"/><text class="tick" x="436.0" y="331" text-anchor="middle">40%</text><line class="grid" x1="510.0" x2="510.0" y1="10" y2="315"/><text class="tick" x="510.0" y="331" text-anchor="middle">50%</text><text class="cat" x="132" y="35.8" text-anchor="end">Search Tasks</text><rect x="140" y="18.7" width="345.6" height="26.1" rx="4" fill="#D93F3F"><title>Search Tasks: 46.7% of requests failed</title></rect><text class="val" x="491.6" y="35.8">46.7%</text><text class="cat" x="132" y="79.4" text-anchor="end">Create Task</text><rect x="140" y="62.3" width="187.2" height="26.1" rx="4" fill="#D93F3F"><title>Create Task: 25.3% of requests failed</title></rect><text class="val" x="333.2" y="79.4">25.3%</text><text class="cat" x="132" y="122.9" text-anchor="end">Update Task</text><rect x="140" y="105.9" width="118.4" height="26.1" rx="4" fill="#D93F3F"><title>Update Task: 16.0% of requests failed</title></rect><text class="val" x="264.4" y="122.9">16.0%</text><text class="cat" x="132" y="166.5" text-anchor="end">Delete Task</text><rect x="140" y="149.4" width="103.6" height="26.1" rx="4" fill="#E8A317"><title>Delete Task: 14.0% of requests failed</title></rect><text class="val" x="249.6" y="166.5">14.0%</text><text class="cat" x="132" y="210.1" text-anchor="end">Get Security Token</text><rect x="140" y="193.0" width="88.8" height="26.1" rx="4" fill="#E8A317"><title>Get Security Token: 12.0% of requests failed</title></rect><text class="val" x="234.8" y="210.1">12.0%</text><text class="cat" x="132" y="253.6" text-anchor="end">Log In</text><rect x="140" y="236.6" width="88.8" height="26.1" rx="4" fill="#E8A317"><title>Log In: 12.0% of requests failed</title></rect><text class="val" x="234.8" y="253.6">12.0%</text><text class="cat" x="132" y="297.2" text-anchor="end">Log Out</text><rect x="140" y="280.1" width="5.2" height="26.1" rx="4" fill="#2E9E5B"><title>Log Out: 0.7% of requests failed</title></rect><text class="val" x="151.2" y="297.2">0.7%</text><text class="axis" x="325.0" y="354" text-anchor="middle">Error rate under heavy load (%)</text></svg>
+    </div>
+    <div class="chart-box">
+      <h3>Chart 3: What Type of Errors Happened?</h3>
+      <p><b>429</b> = "Too many requests, slow down". <b>500</b> = "Something broke on the server". <b>503</b> = "Server too busy, try later".</p>
+      <svg class="chart" viewBox="0 0 560 360" role="img" aria-label="Error types: 69 of 429, 63 of 500, 58 of 503"><path class="slice" d="M280,150 L280.0,20.0 A130,130 0 0 1 378.5,234.8 Z" fill="#E8A317"><title>429 Too Many Requests: 69 errors</title></path><text class="slicetext" x="350.9" y="124.5" text-anchor="middle">69</text><path class="slice" d="M280,150 L378.5,234.8 A130,130 0 0 1 157.8,194.2 Z" fill="#D93F3F"><title>500 Server Error: 63 errors</title></path><text class="slicetext" x="265.9" y="233.7" text-anchor="middle">63</text><path class="slice" d="M280,150 L157.8,194.2 A130,130 0 0 1 280.0,20.0 Z" fill="#6B2D8B"><title>503 Server Busy: 58 errors</title></path><text class="slicetext" x="216.1" y="112.2" text-anchor="middle">58</text><rect x="30" y="312" width="14" height="14" rx="3" fill="#E8A317"/><text class="leg" x="50" y="324">429 Too Many Requests</text><rect x="210" y="312" width="14" height="14" rx="3" fill="#D93F3F"/><text class="leg" x="230" y="324">500 Server Error</text><rect x="390" y="312" width="14" height="14" rx="3" fill="#6B2D8B"/><text class="leg" x="410" y="324">503 Server Busy</text></svg>
+    </div>
+    <div class="chart-box full">
+      <h3>Chart 4: Did It Pass or Fail?</h3>
+      <p>An action passes if, under heavy load, it answers in 2 seconds or less on average <b>and</b> fails less than 5% of the time.</p>
+      <div class="table-scroll">
+      <table>
+        <thead><tr><th>Endpoint</th><th>Normal Speed</th><th>Heavy Load Speed</th><th>Heavy Load Errors</th><th>Result</th></tr></thead>
+        <tbody><tr><td><b>Get Security Token</b></td><td class="num good">156 ms</td><td class="num good">977 ms</td><td class="num warn">12.0%</td><td class="result bad">❌ Fail</td></tr><tr><td><b>Log In</b></td><td class="num good">180 ms</td><td class="num bad">2,434 ms</td><td class="num warn">12.0%</td><td class="result bad">❌ Fail</td></tr><tr><td><b>Search Tasks</b></td><td class="num good">173 ms</td><td class="num bad">6,414 ms</td><td class="num bad">46.7%</td><td class="result bad">❌ Fail</td></tr><tr><td><b>Create Task</b></td><td class="num good">126 ms</td><td class="num bad">4,180 ms</td><td class="num bad">25.3%</td><td class="result bad">❌ Fail</td></tr><tr><td><b>Update Task</b></td><td class="num good">167 ms</td><td class="num bad">3,667 ms</td><td class="num bad">16.0%</td><td class="result bad">❌ Fail</td></tr><tr><td><b>Delete Task</b></td><td class="num good">151 ms</td><td class="num bad">3,046 ms</td><td class="num warn">14.0%</td><td class="result bad">❌ Fail</td></tr><tr><td><b>Log Out</b></td><td class="num good">180 ms</td><td class="num good">296 ms</td><td class="num good">0.7%</td><td class="result good">✅ Pass</td></tr></tbody>
+      </table>
+      </div>
+      <p class="rule">Result: <b>1 of 7 actions passed</b>. Every action passed comfortably under normal load.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 4. PLAIN ENGLISH -->
+<section class="story">
+  <h2><span class="num">4</span>What This Means, in Plain English</h2>
+  <h3>What went well</h3>
+  <p>With a small group of 5 people using it at once, the app did everything right. All 105 requests succeeded and every action finished in well under half a second (about 0.16 seconds on average). Logging out stayed quick and dependable even under heavy pressure. Getting the security token stayed under 1 second on average, though it did sometimes fail.</p>
+  <h3>What struggled under heavy load</h3>
+  <p>When we raised the load to 50 people at once, the app slowed down sharply and started failing. Searching for tasks was the worst: it took 6.4 seconds on average, and almost half of all searches (46.7%) failed. Creating, updating and deleting tasks slowed to between 3 and 4.2 seconds, and between 14% and 25% of those requests failed. Even logging in took 2.4 seconds and failed 12% of the time.</p>
+  <h3>What a real user would have experienced</h3>
+  <p>A real person would have watched the screen spin for several seconds after most clicks. Sometimes they would have seen an error message telling them the system was busy or had broken. About 1 in 5 of their actions would not have worked at all, so tasks they created or changed might not have been saved. That leads to frustration, repeated clicks (which add even more load) and calls to the help desk.</p>
+  <h3>Is the app ready for real users?</h3>
+  <p><b>Not yet.</b> It is fine for a handful of people, but it cannot handle 50 people using it at the same time. Before launch, the team should fix the search, the server errors and the capacity limits listed below. Then the heavy load test should be run again to prove the fixes work.</p>
+</section>
+
+<!-- 5. TOP 3 FIXES -->
+<section>
+  <h2><span class="num">5</span>Top 3 Things to Fix</h2>
+  <div class="fixes">
+    <div class="fix c-red">
+      <div class="icon">🔴</div>
+      <div>
+        <h3>Priority 1: Search Tasks breaks under load</h3>
+        <p><span class="tag">Problem:</span> Under heavy load, Search Tasks averaged 6.4 seconds, failed 46.7% of the time and hit the 10-second time limit 31 times.</p>
+        <p><span class="tag">Fix:</span> Profile the search query, then add database indexes, limit results per page and cache common searches so each search does far less work.</p>
+      </div>
+    </div>
+    <div class="fix c-amber">
+      <div class="icon">🟡</div>
+      <div>
+        <h3>Priority 2: The server crashes and runs out of room</h3>
+        <p><span class="tag">Problem:</span> There were 121 "server broke" (500) and "server too busy" (503) errors, mostly when creating, updating or deleting tasks.</p>
+        <p><span class="tag">Fix:</span> Check the server logs behind the 500 errors. Then add capacity (more app instances, larger database connection pools) so the system can serve 50 people at once.</p>
+      </div>
+    </div>
+    <div class="fix c-green">
+      <div class="icon">🟢</div>
+      <div>
+        <h3>Priority 3: Real users are being turned away by rate limits</h3>
+        <p><span class="tag">Problem:</span> 69 requests were rejected with "too many requests" (429), even though this was ordinary user activity.</p>
+        <p><span class="tag">Fix:</span> Set the rate limit to match expected real-world traffic. Also add automatic "wait and retry" handling so users don't see an error.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>Source: JMeter results files results_good_run.jtl (normal load) and results_stress_run.jtl (heavy load). Figures cover the 7 individual app requests. User journey totals (TC01–TC06) are left out so nothing is counted twice.</footer>
+
+</body>
+</html>

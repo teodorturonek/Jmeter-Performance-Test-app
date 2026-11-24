@@ -1,0 +1,39 @@
+You are a JMeter performance testing expert.
+
+I want to create a JMeter test script but I am not familiar with the application.
+Help me build a complete JMX test script by doing the following:
+
+STEP 1 — DISCOVER THE APP:
+I will give you one of the following. Use it to understand the app:
+- A Swagger/OpenAPI URL or JSON: [paste URL or JSON here]
+- OR a list of URLs I captured from browser DevTools: [paste URLs here]
+- OR a description of what the app does: [describe the app here]
+
+STEP 2 — IDENTIFY THE FLOW:
+From what I gave you, identify:
+- What is the authentication mechanism? (session cookie, JWT, OAuth, API key, CSRF token, none?)
+- Are there any tokens or dynamic values that need to be extracted and reused? (correlation)
+- What is the logical user journey through the app?
+- What endpoints exist and what HTTP methods do they use?
+
+STEP 3 — GENERATE THE JMX SCRIPT:
+Based on your findings, generate a complete JMeter JMX file with:
+- Thread Group: 10 users, 30s ramp-up, 3 loops
+- CSV Data Set Config for any parameterised data (create sample CSV files too)
+- JSON/Regex Extractors for any dynamic values you identified (correlation)
+- HTTP Header Manager with appropriate headers
+- HTTP Cookie Manager
+- Response Code Assertions (assert expected status codes)
+- JSON Assertions for key fields in responses
+- Duration Assertion: flag responses over 2000ms
+- Listeners: View Results Tree, Aggregate Report, Summary Report
+- Save results to: results/test_run_1.jtl
+
+STEP 4 — EXPLAIN YOUR DECISIONS:
+After the JMX, provide a short summary:
+- What correlation did you add and why
+- What data did you parameterise and why
+- Any assumptions you made
+- What sample CSV data I need to prepare
+
+[PASTE YOUR APP INFO BELOW THIS LINE]

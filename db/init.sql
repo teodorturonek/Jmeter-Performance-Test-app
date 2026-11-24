@@ -17,15 +17,20 @@ CREATE TABLE tasks (
 );
 
 CREATE INDEX idx_tasks_user_id ON tasks(user_id);
-CREATE SEQUENCE task_id_seq START 26;
+CREATE SEQUENCE task_id_seq START 51;
 
--- Seed users (passwords: password1, password2, ... password5)
+-- Seed users (passwords: password1 ... password10)
 INSERT INTO users (username, password_hash) VALUES
-('user1', crypt('password1', gen_salt('bf', 10))),
-('user2', crypt('password2', gen_salt('bf', 10))),
-('user3', crypt('password3', gen_salt('bf', 10))),
-('user4', crypt('password4', gen_salt('bf', 10))),
-('user5', crypt('password5', gen_salt('bf', 10)));
+('user1',  crypt('password1',  gen_salt('bf', 10))),
+('user2',  crypt('password2',  gen_salt('bf', 10))),
+('user3',  crypt('password3',  gen_salt('bf', 10))),
+('user4',  crypt('password4',  gen_salt('bf', 10))),
+('user5',  crypt('password5',  gen_salt('bf', 10))),
+('user6',  crypt('password6',  gen_salt('bf', 10))),
+('user7',  crypt('password7',  gen_salt('bf', 10))),
+('user8',  crypt('password8',  gen_salt('bf', 10))),
+('user9',  crypt('password9',  gen_salt('bf', 10))),
+('user10', crypt('password10', gen_salt('bf', 10)));
 
 -- Seed tasks
 INSERT INTO tasks (task_id, user_id, description, due_date, status) VALUES
@@ -58,4 +63,34 @@ INSERT INTO tasks (task_id, user_id, description, due_date, status) VALUES
 ('TASK-022', 5, 'Organise team building event', '2026-09-23', 'active'),
 ('TASK-023', 5, 'Complete compliance training module', '2026-09-06', 'completed'),
 ('TASK-024', 5, 'Draft Q4 objectives and key results', '2026-09-20', 'active'),
-('TASK-025', 5, 'Book travel for conference', '2026-09-10', 'completed');
+('TASK-025', 5, 'Book travel for conference', '2026-09-10', 'completed'),
+-- user6
+('TASK-026', 6, 'Analyse customer feedback survey results', '2026-09-15', 'active'),
+('TASK-027', 6, 'Create monthly performance report', '2026-09-11', 'active'),
+('TASK-028', 6, 'Review SLA compliance metrics', '2026-09-18', 'completed'),
+('TASK-029', 6, 'Update risk register', '2026-09-22', 'active'),
+('TASK-030', 6, 'Prepare board meeting agenda', '2026-09-08', 'completed'),
+-- user7
+('TASK-031', 7, 'Refactor authentication module', '2026-09-16', 'active'),
+('TASK-032', 7, 'Write integration tests for payments', '2026-09-12', 'active'),
+('TASK-033', 7, 'Optimise slow database queries', '2026-09-20', 'active'),
+('TASK-034', 7, 'Set up CI/CD pipeline for new service', '2026-09-09', 'completed'),
+('TASK-035', 7, 'Document API versioning strategy', '2026-09-25', 'active'),
+-- user8
+('TASK-036', 8, 'Run penetration testing on staging', '2026-09-13', 'active'),
+('TASK-037', 8, 'Review GDPR data retention policies', '2026-09-19', 'active'),
+('TASK-038', 8, 'Patch vulnerable dependencies', '2026-09-07', 'completed'),
+('TASK-039', 8, 'Conduct security awareness training', '2026-09-21', 'active'),
+('TASK-040', 8, 'Update firewall rules for new services', '2026-09-10', 'completed'),
+-- user9
+('TASK-041', 9, 'Define acceptance criteria for sprint 12', '2026-09-14', 'active'),
+('TASK-042', 9, 'Facilitate retrospective session', '2026-09-11', 'completed'),
+('TASK-043', 9, 'Update product roadmap for Q4', '2026-09-23', 'active'),
+('TASK-044', 9, 'Prioritise backlog with stakeholders', '2026-09-17', 'active'),
+('TASK-045', 9, 'Write release notes for v2.4', '2026-09-08', 'completed'),
+-- user10
+('TASK-046', 10, 'Migrate legacy reports to new platform', '2026-09-16', 'active'),
+('TASK-047', 10, 'Train team on new analytics tool', '2026-09-12', 'active'),
+('TASK-048', 10, 'Build automated dashboard for KPIs', '2026-09-20', 'active'),
+('TASK-049', 10, 'Validate data pipeline accuracy', '2026-09-09', 'completed'),
+('TASK-050', 10, 'Present insights to leadership team', '2026-09-24', 'active');

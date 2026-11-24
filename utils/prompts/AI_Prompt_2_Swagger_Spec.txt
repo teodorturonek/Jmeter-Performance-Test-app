@@ -1,0 +1,36 @@
+You are a JMeter performance testing expert.
+
+I have an OpenAPI/Swagger specification for an API I want to load test.
+I do not know the application well. Use the spec to build a complete test script.
+
+ANALYSE THE SPEC AND DO THE FOLLOWING:
+
+1. IDENTIFY AUTH:
+   - What authentication scheme is defined? (Bearer, API key, OAuth2, cookie, CSRF?)
+   - Which endpoints require auth and which are public?
+   - Is there a login or token endpoint? If so, extract the token for reuse (correlation)
+
+2. BUILD A REALISTIC USER JOURNEY:
+   - Identify a logical sequence of API calls a real user would make
+   - Prioritise: login → read data → create → update → delete → logout (if applicable)
+   - Ignore admin or internal endpoints unless they are the only ones available
+
+3. GENERATE A COMPLETE JMX FILE:
+   - Thread Group: 10 users, 30s ramp-up, 3 loops
+   - HTTP Request Defaults with the base URL from the spec
+   - HTTP Header Manager: Content-Type application/json + any auth headers
+   - HTTP Cookie Manager
+   - CSV Data Set Config for usernames, passwords, or any input data (provide sample CSV)
+   - JSON Extractor for any tokens or IDs returned in responses (correlation)
+   - Response Assertions: assert correct HTTP status codes per endpoint
+   - JSON Assertions: assert key fields exist in responses
+   - Duration Assertion: 2000ms max on all requests
+   - Listeners: View Results Tree, Aggregate Report, Summary Report, Response Time Graph
+   - Results file: results/test_run_1.jtl
+
+4. AFTER THE JMX, PROVIDE:
+   - A table listing every endpoint used, the expected status code, and any correlation applied
+   - Sample CSV file contents I need to create
+   - Any limitations or assumptions made
+
+[PASTE YOUR SWAGGER JSON OR YAML BELOW THIS LINE]
