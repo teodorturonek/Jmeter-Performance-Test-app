@@ -69,6 +69,7 @@ const SEED_TASKS = [
   ['Build automated dashboard for KPIs', '2026-09-20', 'active'],
   ['Validate data pipeline accuracy', '2026-09-09', 'completed'],
   ['Present insights to leadership team', '2026-09-24', 'active'],
+];
 
 async function resetAndReseed(pool) {
   const client = await pool.connect();
